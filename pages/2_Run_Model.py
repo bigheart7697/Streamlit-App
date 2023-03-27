@@ -37,7 +37,6 @@ def create_float_list_from_string(s):
 
 
 # Data preprocessing to format feature columns and get prediction target column 'labels'
-# @st.cache_data
 def preprocess_data(tcc):
     target = 'Churn'
     ID_col = 'customerID'

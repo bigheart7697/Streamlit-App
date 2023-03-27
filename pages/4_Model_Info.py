@@ -48,7 +48,6 @@ def compare_models():
     support = []
     macro_average = {'precision': [], 'recall': [], 'f1-score': []}
     weighted_average = {'precision': [], 'recall': [], 'f1-score': []}
-    # print(st.session_state.reports)
     for el in st.session_state.reports:
         churn_data['precision'].append(el['1']['precision'])
         churn_data['recall'].append(el['1']['recall'])
