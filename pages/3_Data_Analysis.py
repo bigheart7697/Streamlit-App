@@ -123,12 +123,18 @@ def total_charges_distplot():
 if __name__ == '__main__':
     st.title('Data Analytic Plots')
     tab1, tab2, tab3 = st.tabs(["Personal Data", "Service Data", "Payment Data"])
-    with tab1:
-        gender_seniority_plot()
-    with tab2:
-        service_bar_plots()
-    with tab3:
-        st.header('Payment-Based Charts')
-        monthly_charge_tenure_scatter_plot()
-        monthly_charge_churn_histogram()
-        total_charges_distplot()
+    try:
+        with tab1:
+            if st.session_state.tcc is not None:
+                gender_seniority_plot()
+        with tab2:
+            if st.session_state.tcc is not None:
+                service_bar_plots()
+        with tab3:
+            if st.session_state.tcc is not None:
+                st.header('Payment-Based Charts')
+                monthly_charge_tenure_scatter_plot()
+                monthly_charge_churn_histogram()
+                total_charges_distplot()
+    except:
+        st.error('Your data file is corrupted!')

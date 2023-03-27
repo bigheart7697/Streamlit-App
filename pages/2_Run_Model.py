@@ -28,11 +28,15 @@ session_state_parameters = ['parameters', 'reports', 'tcc', 'model', 'roc_plot',
 
 # creates a integer list fro the string
 def create_int_list_from_string(s):
+    if s[0] != '[' or s[-1] != ']':
+        raise ValueError('The input should begin with \'[\' and end with \']\'')
     return [int(num) for num in s[1:-1].split(',')]
 
 
 # creates a float list from the string
 def create_float_list_from_string(s):
+    if s[0] != '[' or s[-1] != ']':
+        raise ValueError('The input should begin with \'[\' and end with \']\'')
     return [float(num) for num in s[1:-1].split(',')]
 
 
@@ -56,7 +60,6 @@ def preprocess_data(tcc):
 
 
 # Split input data into training dataset, and holdout testing dataset
-@st.cache_data
 def create_train_and_test_data(features, labels):
     X_train, X_test, y_train, y_test = train_test_split(features, labels, test_size=0.3, random_state=22)
 
@@ -78,7 +81,6 @@ def create_train_and_test_data(features, labels):
 # In order to find the best set of hyperparameter,
 # xgboost model would try different combination of parameter values from user input lists,
 # and then return the model with best accuracy
-@st.cache_data
 def run_model(X_train_OE, X_test_OE, y_train, y_test,
               xgb_param=None):
     if xgb_param is None:
@@ -98,60 +100,52 @@ def run_model(X_train_OE, X_test_OE, y_train, y_test,
 
 
 # Show model ROC CURV and
-@st.cache_data
 def show_plots(xgb_model, X_test_OE, y_test):
     return xgb_model.show_test_result(X_test_OE, y_test)
 
 
-# Initializes the streamlit session_state
-def initialize_session_state():
-    for param in session_state_parameters:
-        if param not in st.session_state:
-            if param == 'parameters' or param == 'reports':
-                st.session_state[param] = []
-            else:
-                st.session_state[param] = None
-
-
 # Enables the fitting when the enable fitting button is clicked
 def enable_fitting():
-    if st.session_state.uploaded_file is not None:
-        # create a DataFrame from the csv file
-        data_load_state = st.text('Loading data...')
-        st.session_state.tcc = pd.read_csv(st.session_state.uploaded_file)
-        data_load_state.text("Data loaded!")
+    try:
+        if st.session_state.uploaded_file is not None:
+            # create a DataFrame from the csv file
+            data_load_state = st.text('Loading data...')
+            st.session_state.tcc = pd.read_csv(st.session_state.uploaded_file)
+            data_load_state.text("Data loaded!")
 
-        # creates train and test data
-        features, labels = preprocess_data(st.session_state.tcc)
-        X_train_OE, X_test_OE, y_train, y_test = create_train_and_test_data(features, labels)
-        st.session_state.X_train_OE = X_train_OE
-        st.session_state.X_test_OE = X_test_OE
-        st.session_state.y_train = y_train
-        st.session_state.y_test = y_test
+            # creates train and test data
+            features, labels = preprocess_data(st.session_state.tcc)
+            X_train_OE, X_test_OE, y_train, y_test = create_train_and_test_data(features, labels)
+            st.session_state.X_train_OE = X_train_OE
+            st.session_state.X_test_OE = X_test_OE
+            st.session_state.y_train = y_train
+            st.session_state.y_test = y_test
 
-        # tuning the parameters
-        learning_rate = create_float_list_from_string(st.session_state.learning_rate)
-        max_depth = create_int_list_from_string(st.session_state.max_depth)
-        n_estimators = create_int_list_from_string(st.session_state.n_estimators)
-        colsample_bytree = create_float_list_from_string(st.session_state.colsample_bytree)
-        # Run the model
-        with st.spinner('Running the model'):
-            roc_plot, confusion_matrix_plot, report, model = run_model(X_train_OE, X_test_OE, y_train, y_test,
-                                                                       dict(learning_rate=learning_rate,
-                                                                            max_depth=max_depth,
-                                                                            n_estimators=n_estimators,
-                                                                            colsample_bytree=colsample_bytree))
-        st.success('Running the model is done!')
+            # tuning the parameters
+            learning_rate = create_float_list_from_string(st.session_state.learning_rate)
+            max_depth = create_int_list_from_string(st.session_state.max_depth)
+            n_estimators = create_int_list_from_string(st.session_state.n_estimators)
+            colsample_bytree = create_float_list_from_string(st.session_state.colsample_bytree)
+            # Run the model
+            with st.spinner('Running the model'):
+                roc_plot, confusion_matrix_plot, report, model = run_model(X_train_OE, X_test_OE, y_train, y_test,
+                                                                           dict(learning_rate=learning_rate,
+                                                                                max_depth=max_depth,
+                                                                                n_estimators=n_estimators,
+                                                                                colsample_bytree=colsample_bytree))
+            st.success('Running the model is done!')
 
-        # Update the session state to store the model data
-        st.session_state.parameters.append(dict(learning_rate=learning_rate,
-                                                max_depth=max_depth,
-                                                n_estimators=n_estimators,
-                                                colsample_bytree=colsample_bytree))
-        st.session_state.model = model
-        st.session_state.roc_plot = roc_plot
-        st.session_state.confusion_matrix_plot = confusion_matrix_plot
-        st.session_state.reports.append(report)
+            # Update the session state to store the model data
+            st.session_state.parameters.append(dict(learning_rate=learning_rate,
+                                                    max_depth=max_depth,
+                                                    n_estimators=n_estimators,
+                                                    colsample_bytree=colsample_bytree))
+            st.session_state.model = model
+            st.session_state.roc_plot = roc_plot
+            st.session_state.confusion_matrix_plot = confusion_matrix_plot
+            st.session_state.reports.append(report)
+    except:
+        st.error('Your input values do not follow the format!')
 
 
 # creates the form to get user input for tuning parameters
@@ -175,5 +169,7 @@ def create_form():
 
 if __name__ == '__main__':
     st.title('Churn Rate Predictor')
-    initialize_session_state()
-    create_form()
+    try:
+        create_form()
+    except:
+        st.error('Your input values do not follow the format!')

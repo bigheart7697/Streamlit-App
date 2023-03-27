@@ -3,6 +3,7 @@ import shap
 import streamlit as st
 from streamlit_shap import st_shap
 
+
 # Plots the summary and data visualization plots for Shap values
 def all_shap_values():
     st.header("Shap Values for All Data")
@@ -40,7 +41,12 @@ def mean_shap_values():
 if __name__ == '__main__':
     st.header('Shap Values for the Machine Learning Model')
     tab1, tab2 = st.tabs(['All Shap Values', 'Mean Shap Values'])
-    with tab1:
-        all_shap_values()
-    with tab2:
-        mean_shap_values()
+    try:
+        with tab1:
+            if st.session_state.tcc is not None:
+                all_shap_values()
+        with tab2:
+            if st.session_state.tcc is not None:
+                mean_shap_values()
+    except:
+        st.error('Your data file is corrupted!')

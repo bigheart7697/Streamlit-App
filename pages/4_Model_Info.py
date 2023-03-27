@@ -86,23 +86,26 @@ def compare_models():
 if __name__ == '__main__':
     st.header('Trained Machine Learning Models Information')
     tab1, tab2 = st.tabs(['Current Model Info', 'Models Comparison'])
-    with tab1:
-        if st.session_state.tcc is not None:
-            st.header('Current Machine Learning Model Validation Report')
-            st.subheader('ROC Curve')
-            st.markdown('An ROC (receiver operating characteristic) curve is a plot that represents'
-                        ' the performance of the model. The x-axis represents the false positive rate (the data that '
-                        'falsely has been categorized as positive; the y-axis '
-                        'represents the true positive rate (the data that has been correctly predicted as positive.'
-                        ' The area under ROC curve (AUC) is another measurement of the model performance.')
-            show_image_with_download('roc.png', st.session_state.roc_plot.figure)
-            st.caption('ROC curve')
-            st.subheader('Confusion Matrix')
-            st.markdown('Confusion Matrix is a table that is used for measuring a classification model performance. '
-                        'The rows show the true label and the columns show the predicted label. each cell has a color '
-                        'which represents the quantity of the related rate.')
-            show_image_with_download('confusion-matrix.png', st.session_state.confusion_matrix_plot.figure)
-            st.caption('Confusion matrix')
-    with tab2:
-        st.header('Different Models Comparison')
-        compare_models()
+    try:
+        with tab1:
+            if st.session_state.tcc is not None:
+                st.header('Current Machine Learning Model Validation Report')
+                st.subheader('ROC Curve')
+                st.markdown('An ROC (receiver operating characteristic) curve is a plot that represents'
+                            ' the performance of the model. The x-axis represents the false positive rate (the data that '
+                            'falsely has been categorized as positive; the y-axis '
+                            'represents the true positive rate (the data that has been correctly predicted as positive.'
+                            ' The area under ROC curve (AUC) is another measurement of the model performance.')
+                show_image_with_download('roc.png', st.session_state.roc_plot.figure)
+                st.caption('ROC curve')
+                st.subheader('Confusion Matrix')
+                st.markdown('Confusion Matrix is a table that is used for measuring a classification model performance. '
+                            'The rows show the true label and the columns show the predicted label. each cell has a color '
+                            'which represents the quantity of the related rate.')
+                show_image_with_download('confusion-matrix.png', st.session_state.confusion_matrix_plot.figure)
+                st.caption('Confusion matrix')
+        with tab2:
+            st.header('Different Models Comparison')
+            compare_models()
+    except:
+        st.error('Your data file is corrupted!')

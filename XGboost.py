@@ -11,7 +11,6 @@ warnings.filterwarnings('ignore')
 from IPython.core.interactiveshell import InteractiveShell
 
 InteractiveShell.ast_node_interactivity = 'all'
-import shap
 
 
 class XGBmodel(object):
@@ -45,4 +44,3 @@ class XGBmodel(object):
 
     def precision_recall_f1_visual(self, X, y):
         return classification_report(y, self.predict(X), digits=4, output_dict=True)
-
