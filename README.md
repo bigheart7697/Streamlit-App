@@ -8,7 +8,7 @@ Open a terminal and run:
 ```bash
 $ python -m venv /path/to/new/virtual/environment
 $ /path/to/new/virtual/environment/Scripts/activate
-$ pip install requirements.txt
+$ pip install -r requirements.txt
 ```
 
 
